@@ -37,23 +37,26 @@ if (!(Test-Path "$ImportPath")) {
 
     Write-Host "Import Path for JSON file doesn't exist..." -ForegroundColor Red
     Write-Host "Script can't continue..." -ForegroundColor Red
-    Write-Host
     break
 
 }
 
 ####################################################
 
-$JSON_Data = Get-Content -Path "$ImportPath"
+# Importing JSON file
+$JsonPolicyBody = Get-Content -Path "$ImportPath"
 
-$JSON_Convert = ($JSON_Data | ConvertFrom-Json -AsHashtable).AdditionalProperties
+## Converting JSON to HashTable
+$ConvertedPolicyBody = ($JSON_Data | ConvertFrom-Json -AsHashtable).AdditionalProperties
 
-$DisplayName = ($JSON_Data | ConvertFrom-Json).DisplayName
+## Storing the display name of the policy in a variable
+$DisplayName = ($JsonPolicyBody | ConvertFrom-Json).DisplayName
 
-write-host
-write-host "Device Configuration Policy '$DisplayName' Found..." -ForegroundColor Yellow
-write-host
-$JSON_Output
-write-host
+Write-Host "Device Configuration Policy '$DisplayName' Found..." -ForegroundColor Yellow
+
+## Displaying the policy settings
+$ConvertedPolicyBody
 Write-Host "Adding Device Configuration Policy '$DisplayName'" -ForegroundColor Yellow
+
+## Creating the policy in Intune
 New-MgDeviceManagementDeviceConfiguration -DisplayName $DisplayName -AdditionalProperties $JSON_Convert
